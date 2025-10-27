@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Selecciona Perfil</title></head>
+<body>
+<h1>Selecciona tu perfil</h1>
+<div>
+    {% for perfil in perfiles %}
+    <form action="{{ url_for('valida_pin', perfil_id=perfil.id) }}" method="get" style="display:inline-block; margin:10px;">
+        <button type="submit">{{ perfil.nombre_perfil }}</button>
+    </form>
+    {% endfor %}
+</div>
+</body>
+</html>

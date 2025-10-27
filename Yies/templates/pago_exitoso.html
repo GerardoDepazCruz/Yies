@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago exitoso</title>
+    <link rel="stylesheet" href="/static/css/pago_exitoso.css">
+</head>
+<body>
+<div class="contenedor-exito">
+    <div class="tarjeta">
+        <h2>¡Pago realizado con éxito!</h2>
+        <p>Tu método de pago fue: <strong>{{ metodo_pago }}</strong></p>
+        <p>Se ha enviado un correo de confirmación a:</p>
+        <p class="correo">{{ correo }}</p>
+        <a href="/" class="btn-volver">Volver al inicio</a>
+    </div>
+</div>
+</body>
+</html>

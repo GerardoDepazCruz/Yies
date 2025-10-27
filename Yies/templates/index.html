@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Yies Streaming - Inicio</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+<h1>Bienvenido a Yies</h1>
+
+<section class="button-group" id="inicio">
+    <button class="btn btn-login" onclick="mostrarLogin()">Login</button>
+    <button class="btn btn-suscripcion" onclick="mostrarSuscripcion()">Suscribirse</button>
+</section>
+
+<!-- LOGIN -->
+<section id="login" class="form-section" style="display:none;">
+    <button class="volver" onclick="mostrarInicio()">← Volver</button>
+    <h2>Iniciar Sesión</h2>
+    <form action="/login" method="post" class="formulario">
+        <label>Correo:</label><br />
+        <input type="email" name="correo" required /><br />
+        <label>Contraseña:</label><br />
+        <input type="password" name="contrasena" required /><br />
+        <button type="submit" class="btn-form">Ingresar</button>
+    </form>
+</section>
+
+<!-- SUSCRIPCIÓN -->
+<section id="suscripcion" class="form-section" style="display:none;">
+    <button class="volver" onclick="mostrarInicio()">← Volver</button>
+    <h2>Suscribirse</h2>
+    <form action="/suscripcion" method="post" class="formulario">
+        <label>Correo:</label><br />
+        <input type="email" name="correo" required /><br />
+
+        <h3>Planes Disponibles</h3>
+        <div class="planes">
+            <div class="plan">
+                <h4>Básico</h4>
+                <p><strong>Precio:</strong> S/9.99</p>
+                <p><strong>Duración:</strong> 30 días</p>
+            </div>
+            <div class="plan">
+                <h4>Premium</h4>
+                <p><strong>Precio:</strong> S/19.99</p>
+                <p><strong>Duración:</strong> 30 días</p>
+            </div>
+        </div>
+
+        <label>Elige plan:</label><br />
+        <select name="plan">
+            <option value="Basico">Básico</option>
+            <option value="Premium">Premium</option>
+        </select><br /><br />
+
+        <button type="submit" class="btn-form">Pagar y Suscribirse</button>
+    </form>
+</section>
+
+<script>
+    function mostrarLogin() {
+        document.getElementById("inicio").style.display = "none";
+        document.getElementById("login").style.display = "block";
+        document.getElementById("suscripcion").style.display = "none";
+    }
+
+    function mostrarSuscripcion() {
+        document.getElementById("inicio").style.display = "none";
+        document.getElementById("login").style.display = "none";
+        document.getElementById("suscripcion").style.display = "block";
+    }
+
+    function mostrarInicio() {
+        document.getElementById("inicio").style.display = "flex";
+        document.getElementById("login").style.display = "none";
+        document.getElementById("suscripcion").style.display = "none";
+    }
+</script>
+</body>
+</html>
