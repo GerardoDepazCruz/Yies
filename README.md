@@ -2,7 +2,7 @@
 
 ## Funcionalidades a agregar:
 
-## Si modifican la Base de datos avisar por el grupo el porque y los demas solo lo implementan :D
+(Si modifican la Base de datos avisar por el grupo el porque y los demas solo lo implementan :D)
 
 - CRUD del contenido multimedia (Admin):
 
