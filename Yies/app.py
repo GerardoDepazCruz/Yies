@@ -25,6 +25,8 @@ plan_model = Plan()
 suscripcion_model = Suscripcion()
 perfil_model = Perfil()
 pago_model = Pago()
+historial_model = Historial()
+
 
 def generar_pin():
     return ''.join(random.choices(string.digits, k=5))
@@ -133,4 +135,79 @@ def catalogo():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/visualizacion', methods=['POST'])
+def registrar_visualizacion():
+    usuario_id = request.form.get('usuario_id') or request.json.get('usuario_id')
+    contenido_id = request.form.get('contenido_id') or request.json.get('contenido_id')
+    if not usuario_id or not contenido_id:
+        return jsonify({'error': 'Faltan datos'}), 400
+    try:
+        historial_model.registrar_visualizacion(int(usuario_id), int(contenido_id))
+        return jsonify({'ok': True}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/historial/<int:usuario_id>', methods=['GET'])
+def obtener_historial(usuario_id):
+    try:
+        resultados = historial_model.obtener_historial(usuario_id)
+        return jsonify({'historial': resultados}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/valoracion', methods=['POST'])
+def crear_valoracion():
+    data = request.form if request.form else request.get_json()
+    usuario_id = data.get('usuario_id')
+    contenido_id = data.get('contenido_id')
+    calificacion = data.get('calificacion')
+    comentario = data.get('comentario')
+    if not usuario_id or not contenido_id or not calificacion:
+        return jsonify({'error': 'Faltan datos'}), 400
+    try:
+        historial_model.crear_o_actualizar_valoracion(int(usuario_id), int(contenido_id), int(calificacion), comentario)
+        return jsonify({'ok': True}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/valoracion', methods=['PUT'])
+def actualizar_valoracion():
+    data = request.get_json()
+    usuario_id = data.get('usuario_id')
+    contenido_id = data.get('contenido_id')
+    calificacion = data.get('calificacion')
+    comentario = data.get('comentario')
+    if not usuario_id or not contenido_id or not calificacion:
+        return jsonify({'error': 'Faltan datos'}), 400
+    try:
+        historial_model.crear_o_actualizar_valoracion(int(usuario_id), int(contenido_id), int(calificacion), comentario)
+        return jsonify({'ok': True}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/valoracion', methods=['DELETE'])
+def eliminar_valoracion():
+    data = request.args if request.args else request.get_json()
+    usuario_id = data.get('usuario_id')
+    contenido_id = data.get('contenido_id')
+    if not usuario_id or not contenido_id:
+        return jsonify({'error': 'Faltan datos'}), 400
+    try:
+        ok = historial_model.borrar_valoracion(int(usuario_id), int(contenido_id))
+        if ok:
+            return jsonify({'ok': True}), 200
+        else:
+            return jsonify({'error': 'No encontrada'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/valoraciones/contenido/<int:contenido_id>', methods=['GET'])
+def valoraciones_contenido(contenido_id):
+    try:
+        datos = historial_model.obtener_valoraciones_contenido(contenido_id)
+        return jsonify(datos), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
