@@ -6,6 +6,7 @@ from models.suscripcion import Suscripcion
 from models.perfil import Perfil
 from models.pago import Pago
 from datetime import datetime, timedelta
+from models.historial import Historial
 import random
 import string
 
@@ -132,3 +133,4 @@ def catalogo():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
