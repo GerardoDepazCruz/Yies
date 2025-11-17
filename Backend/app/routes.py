@@ -102,6 +102,75 @@ def get_all_users(current_user):
     output = [user.to_dict() for user in users]
     return jsonify({'users': output})
 
+
+@api_bp.route('/users/<int:user_id>', methods=['DELETE'])
+@token_required
+def delete_user(current_user, user_id):
+    """Eliminar un usuario. Permite al usuario eliminar su propia cuenta o a un admin eliminar cualquier cuenta."""
+    # Permiso: propietario o admin
+    if current_user.role != 'admin' and current_user.id != user_id:
+        return jsonify({'message': 'Not authorized to delete this user.'}), 403
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'User not found.'}), 404
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'message': 'User deleted.'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Error deleting user.', 'error': str(e)}), 500
+
+
+@api_bp.route('/users/<int:user_id>', methods=['PATCH'])
+@token_required
+def update_user(current_user, user_id):
+    """Actualizar nombre y/o contraseña de un usuario.
+    El propietario del perfil o un admin pueden realizar cambios.
+    Para cambiar contraseña se requiere `current_password` en el body.
+    """
+    # permiso: propietario o admin
+    if current_user.role != 'admin' and current_user.id != user_id:
+        return jsonify({'message': 'Not authorized to update this user.'}), 403
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'User not found.'}), 404
+
+    data = request.get_json() or {}
+    changed = False
+
+    # Actualizar contraseña (si se envía)
+    if 'password' in data:
+        current_password = data.get('current_password')
+        if not current_password or not user.check_password(current_password):
+            return jsonify({'message': 'Current password is incorrect.'}), 401
+        user.set_password(data.get('password'))
+        changed = True
+
+    # Actualizar nombre (guardado en Profile)
+    if 'name' in data:
+        name = data.get('name')
+        if user.profiles and len(user.profiles) > 0:
+            user.profiles[0].name = name
+        else:
+            profile = Profile(name=name, avatar_url=None)
+            user.profiles.append(profile)
+            db.session.add(profile)
+        changed = True
+
+    if not changed:
+        return jsonify({'message': 'No valid fields to update.'}), 400
+
+    try:
+        db.session.commit()
+        return jsonify({'user': user.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Error updating user.', 'error': str(e)}), 500
+
 @api_bp.route('/')
 def index():
     return jsonify({"message": "API del Backend de Yies está funcionando!"})
