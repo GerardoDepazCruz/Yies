@@ -22,11 +22,25 @@ class User(db.Model):
 
     def to_dict(self):
         """Convierte el objeto User a un diccionario para respuestas JSON."""
+        # intentar extraer un nombre y avatar desde el primer perfil asociado
+        name = None
+        avatar_url = None
+        if self.profiles and len(self.profiles) > 0:
+            try:
+                primary = self.profiles[0]
+                name = getattr(primary, 'name', None)
+                avatar_url = getattr(primary, 'avatar_url', None)
+            except Exception:
+                name = None
+                avatar_url = None
+
         return {
             "id": self.id,
             "email": self.email,
             "role": self.role,
-            "creation_date": self.creation_date.isoformat()
+            "creation_date": self.creation_date.isoformat(),
+            "name": name,
+            "avatar_url": avatar_url,
         }
 
 # (El resto de los modelos permanecen igual que antes)

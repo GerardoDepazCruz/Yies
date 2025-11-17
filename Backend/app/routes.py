@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from .models import User
+from .models import User, Profile
 from . import db
 import jwt
 from datetime import datetime, timedelta
@@ -43,18 +43,26 @@ def register_user():
     data = request.get_json()
     if not data or not data.get('email') or not data.get('password'):
         return jsonify({'message': 'Email and password are required!'}), 400
-
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'User already exists!'}), 409
 
+    name = data.get('name')
+
     new_user = User(email=data['email'])
     new_user.set_password(data['password'])
-    
+
     # El primer usuario registrado será admin
     if User.query.count() == 0:
         new_user.role = 'admin'
 
     db.session.add(new_user)
+
+    # Si se proporcionó un nombre, crear un Profile asociado
+    if name:
+        profile = Profile(name=name, avatar_url=None)
+        new_user.profiles.append(profile)
+        db.session.add(profile)
+
     db.session.commit()
 
     return jsonify({'message': 'New user created!'}), 201
@@ -77,8 +85,13 @@ def login_user():
         'role': user.role,
         'exp': datetime.utcnow() + timedelta(hours=24) # Token válido por 24 horas
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
+    # Devolver también información básica del usuario para que el frontend tenga nombre/email
+    try:
+        user_info = user.to_dict()
+    except Exception:
+        user_info = {"id": user.id, "email": user.email, "role": user.role}
 
-    return jsonify({'token': token})
+    return jsonify({'token': token, 'user': user_info})
 
 @api_bp.route('/users', methods=['GET'])
 @token_required
