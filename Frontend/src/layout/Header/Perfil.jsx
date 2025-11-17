@@ -58,11 +58,6 @@ export const Perfil = () => {
     navigate('/profile');
   };
 
-  const handleSettings = () => {
-    setOpen(false);
-    navigate('/profile');
-  };
-
   const handleLogout = () => {
     logout();
     setOpen(false);
@@ -111,7 +106,6 @@ export const Perfil = () => {
           <div className="py-1">
             <ul>
               <li onClick={handleProfile} className="px-4 py-2 hover:bg-gray-600 cursor-pointer text-white">Mi Perfil</li>
-              <li onClick={handleSettings} className="px-4 py-2 hover:bg-gray-600 cursor-pointer text-white">Configuración</li>
               <li onClick={handleLogout} className="px-4 py-2 hover:bg-gray-600 cursor-pointer text-red-400">Cerrar Sesión</li>
             </ul>
           </div>
