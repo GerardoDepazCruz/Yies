@@ -77,11 +77,17 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
       const token = data.token;
       localStorage.setItem('yies_token', token);
-
-      // decodificar payload
-      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-      setCurrentUser({ id: payload.user_id, email: payload.email || email, role: payload.role });
-      return { success: true, role: payload.role };
+      // Si el backend devolvió información de usuario, usarla; si no, decodificar token
+      let role = null;
+      if (data.user) {
+        setCurrentUser(data.user);
+        role = data.user.role;
+      } else {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        setCurrentUser({ id: payload.user_id, email: payload.email || email, role: payload.role });
+        role = payload.role;
+      }
+      return { success: true, role };
     } catch (err) {
       return { success: false, message: err.message };
     }
@@ -121,7 +127,7 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch('http://127.0.0.1:5000/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       if (res.status === 201) {

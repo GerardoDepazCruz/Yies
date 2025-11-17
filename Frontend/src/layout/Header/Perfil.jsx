@@ -99,8 +99,12 @@ export const Perfil = () => {
               </div>
             )}
             <div>
-              <div className="text-sm font-medium text-white">{displayName}</div>
-              {currentUser?.email && <div className="text-xs text-gray-300">{currentUser.email}</div>}
+              <div className="text-sm font-medium text-white">
+                {currentUser?.name ? currentUser.name : (currentUser?.email || displayName)}
+              </div>
+              {currentUser?.name && currentUser?.email && (
+                <div className="text-xs text-gray-300">{currentUser.email}</div>
+              )}
             </div>
           </div>
 
